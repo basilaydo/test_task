@@ -12,6 +12,7 @@ PORT = 8091
 
 REST_URL = "http://{0}:{1}".format(HOST, PORT)
 
+
 @pytest.fixture(scope='session', autouse=True)
 def use_docker(image=DOCKER_IMAGE, tag=DOCKER_TAG, host=HOST, port=PORT, timeout=60):
     """Fixture that runs docker container on start and stops upon completion a session
@@ -20,8 +21,12 @@ def use_docker(image=DOCKER_IMAGE, tag=DOCKER_TAG, host=HOST, port=PORT, timeout
     :type image: str
     :param tag: docker tag
     :type tag: str
+    :param host: host IP
+    :type host: str
     :param port: TCP port
     :type port: int
+    :param timeout: connection timeout
+    :type timeout: int
     :return: None
     """
     run_kwargs = {
