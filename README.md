@@ -5,6 +5,22 @@
 platform: linux, Python 3.6.9, pytest 6.0.1, pytest-sugar 0.9.4
 plugins: sugar-0.9.4, xdist-2.1.0, forked-1.3.0, cov-2.10.1
 
+## Условия запуска
+Необходимые модули:
+
+    pip3 install docker
+    pip3 install pytest
+
+Необходимые программы:
+    
+    sudo apt-get install python3.6
+    sudo apt-get install python-pytest
+    sudo apt-get install docker.io
+
+Строка запуска теста:
+    
+    sudo python3.6 -m pytest rest_api_test.py
+
 ## Спецификации тестируемого приложения
 
 В связи с тем, что базовые спецификации недостаточно полноценны, мною были внесены следующие дополнения:
