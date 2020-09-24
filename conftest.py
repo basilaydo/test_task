@@ -1,20 +1,20 @@
+"""Fixtures for tests"""
+
+import os
+import sys
+sys.path.append(os.getcwd())
+
 import docker
 import time
 import requests
 from socket import create_connection
+from constants import DockerConstants
 import pytest
-
-DOCKER_IMAGE = 'azshoo/alaska'
-DOCKER_TAG = 'latest'
-
-HOST = '0.0.0.0'
-PORT = 8091
-
-REST_URL = "http://{0}:{1}".format(HOST, PORT)
 
 
 @pytest.fixture(scope='session', autouse=True)
-def use_docker(image=DOCKER_IMAGE, tag=DOCKER_TAG, host=HOST, port=PORT, timeout=60):
+def use_docker(image=DockerConstants.DOCKER_IMAGE, tag=DockerConstants.DOCKER_TAG, host=DockerConstants.HOST,
+               port=DockerConstants.PORT, timeout=DockerConstants.CONNECT_TIMEOUT):
     """Fixture that runs docker container on start and stops upon completion a session
 
     :param image: docker image
