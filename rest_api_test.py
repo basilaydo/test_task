@@ -8,7 +8,7 @@ import sys
 sys.path.append(os.getcwd())
 
 from api import ApiClient, validate_response_code
-from constants import DockerConstants, ApiConstants, HTTPCodes, Bears
+from constants import DockerConstants, HTTPCodes, Bears
 
 # Test data
 bear_types_positive = ['POLAR', 'BROWN', 'BLACK', 'GUMMY']

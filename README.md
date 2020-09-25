@@ -50,6 +50,8 @@ bear_id:
     each new bear_id differs from the previous one by 1.
     Cannot be changed
 
+NOTE: I made hardcode for bear keys above with the expectation that they will not change in the future
+
 **Specifications of expected application responses to client requests:**
 
     200 - OK
@@ -99,6 +101,8 @@ _NOTE: due to the fact that most of the invalid requests receive a 200 OK respon
 most negative tests have added checks not only for the expected response code, 
 but also for the fact that the response code is not 200 OK_
 
+_NOTE: I know that I can make "with allure" constructions for tests steps but I decided not implement it
+due to simplicity of the tests_
 
 Positive bear POST create + GET read specific bear
     
