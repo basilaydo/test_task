@@ -96,7 +96,7 @@ rest_api_test.py:
     CLASS TestAlaska:
         testsuit, containing the whole test suite
 
-## Описание тест кейсов
+## Test cases description
 _NOTE: due to the fact that most of the invalid requests receive a 200 OK response, 
 most negative tests have added checks not only for the expected response code, 
 but also for the fact that the response code is not 200 OK_
