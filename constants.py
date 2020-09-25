@@ -25,7 +25,9 @@ class ApiConstants:
 class Bears:
     """Bear constants"""
     GET_ALL_EMPTY_RESPONSE = 'EMPTY'
-
+    SIMPLE_BEAR_JSON = {'bear_type': 'BLACK',
+                        'bear_name': 'BOB',
+                        'bear_age': 10.0}
 
 class HTTPCodes:
     """HTTP response codes"""

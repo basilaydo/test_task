@@ -1,259 +1,278 @@
-# Описание к тестовому заданию
+# Description for the test task
 
 ## Environment
 
 platform: linux, Python 3.6.9, pytest 6.0.1, pytest-sugar 0.9.4
 plugins: sugar-0.9.4, xdist-2.1.0, forked-1.3.0, cov-2.10.1
 
-## Условия запуска
-Необходимые модули:
+## Launch conditions
+Required modules:
 
     pip3 install docker
     pip3 install pytest
+    pip3 install allure-pytest
 
-Необходимые программы:
+Required programs:
     
     sudo apt-get install python3.6
     sudo apt-get install python-pytest
     sudo apt-get install docker.io
+    sudo apt-get install allure
 
-Строка запуска теста:
+Test launch string:
     
-    sudo python3.6 -m pytest rest_api_test.py
+    sudo python3.6 -m pytest rest_api_test.py --alluredir=allure-results
 
-## Спецификации тестируемого приложения
+## Test Application Specifications
 
-В связи с тем, что базовые спецификации недостаточно полноценны, мною были внесены следующие дополнения:
+Due to the fact that the basic specifications are not complete enough, 
+I made the following additions:
 
-**Спецификация форматов и записей базы данных для ключей:**
+**Specification of formats and database records for keys:**
 
 bear_name:
     
-    принимает форматы: str
-    диапазон значений: 1 <= name <= 10
-    формат хранения в базе данных: str
-    конвертация: при сохранении в БД переводит строку в верхний регистр
+    accepted formats: str
+    range: 1 <= name <= 10
+    database storage format: str
+    conversion: when saving to the database, converts the string to uppercase
     
 bear_age:
     
-    принимает форматы: int, float
-    диапазон значений: 0 < age <= 100
-    формат хранения в базе данных (конвертация): float
+    accepted formats: int, float
+    range: 0 < age <= 100
+    database storage format (conversion): float
     
 bear_id:
 
-    формат хранения в базе данных: int
-    создается автоматически сервером при добавлении новой записи
-    каждый новый bear_id отличается от предыдущего на 1
-    не подлежит изменению
+    database storage format: int
+    created automatically by the server when a new record is added, 
+    each new bear_id differs from the previous one by 1.
+    Cannot be changed
 
-**Спецификации ожидаемых ответов приложения на запросы клиента:**
+**Specifications of expected application responses to client requests:**
 
-    200 - Запрос корректен
-    400 - В запросе от клинта содержутся недопустимые значения 
-    404 - Запрашивается несущесвующая информация (несуществующие записи в БД)
+    200 - OK
+    400 - The request from the client contains invalid values
+    404 - Non-existent information is requested (non-existent records in the database)
 
-## Структура тестовой директории:
+## Test directory structure:
 
-README.md: 
+api.py:
 
-    Спецификации, описание тестовой директории, описание тестов 
+    ApiClient class conists of api methods for application tests
+    validate_response_code function to assert response's status codes
 
-common.py:
+constants.py:
 
-    КОНСТАНТЫ:
-        DOCKER_IMAGE
-        HOST
-        PORT
-        REST_URL
+    Global test task constants
+
+conftest.py:
+
     FIXTURE use_docker(scope='session', autouse=True):
         Sturtup: run container, check connectivity
         Teardown: stop and remove container
 
-rest_api_test.py:
+README.md: 
 
+    Description for the test task, specifications, tests
+        
+requirements.txt
+    
+    requirements.txt
+     
+rest_api_test.py:
+    
+    FIXTURE api_bear:
+        API interfaces
     FIXTURE smoke_test(scope='class'):
-        Sturtup: Минимальная функциональная проверка перед началом тестирования
+        Sturtup: Minimum functional check before testing
     FIXTURE clear(scope='function'):
-        Sturtup: очистка БД перед каждым тестом
+        Sturtup: cleaning the database before each test
+    FIXTURE create_simple_bear:
+        Creates simple bear record in database
     CLASS TestAlaska:
-        testsuit, содержащий весь набор тестов
+        testsuit, containing the whole test suite
 
 ## Описание тест кейсов
-_ЗАМЕЧАНИЕ: в связи с тем, что на большинство недопустимых запросов приходит ответ 200 ОК, в большинство 
-негативных тестов были добавлены проверки не только на ожидаемый код ответа, но и на то, что кодом 
-ответа не является 200 ОК_
+_NOTE: due to the fact that most of the invalid requests receive a 200 OK response, 
+most negative tests have added checks not only for the expected response code, 
+but also for the fact that the response code is not 200 OK_
 
 
-Позитивный тест создания и чтения записей в БД
+Positive bear POST create + GET read specific bear
     
-    Автотест: test_positive_create_get_bear
-    Входные данные: допустимые комбинации значний bear_type, bear_name и bear_age медведей
-    Шаги: 
-        сформировать конфигурационный json
-        послать REST Post на создание записи в БД 
-    Ожидаемый результат:
-        получен код 200 от приложения
-        созданная запись соответствует ожидаемой 
-        типы данный в БД соответствуют ожидаемым
+    Autotest name: test_positive_create_get_bear
+    Input data: valid combinations of bear_type, bear_name и bear_age values
+    Steps: 
+        create configuration json
+        send REST Post to create a record in database
+    Expected result:
+        response code 200
+        the created record matches the expected 
+        data types in database correspond to the expected
     
-Позитивный тест проверки bear_id записи при добавлении  
+Check proper bear bear_id incrementation
     
-    Автотест: test_positive_bear_id_incrementation_create_bear
-    Входные данные: None
-    Шаги: 
-        добавить одну запись
-        добавить вторую запись
-    Ожидаемый результат
-        убедиться, что bear_id второго медведя отличается от bear_id певого на 1
+    Autotest name: test_positive_bear_id_incrementation_create_bear
+    Input data: None
+    Steps: 
+        create first record
+        create second record
+    Expected result
+        bear_id of the second bear differs from bear_id of the first one by 1
 
-Негавтивный тест создания записи с недопустимым bear_type
+Negative bear POST create. WRONG bear_type
     
-    Автотест: test_negative_create_bear_types
-    Входные данные: список недопустимых значений bear_type
-    Шаги: 
-        послать REST Post на создание записи
-    Ожидаемый результат:
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_create_bear_types
+    Input data: list of invalid bear_type values
+    Steps: 
+        send REST Post to create a record
+    Expected result:
+        response code not 200
+        response code 400
 
-Негавтивный тест создания записи с недопустимым bear_name
+Negative bear POST create. WRONG bear_name
     
-    Автотест: test_negative_create_bear_names
-    Входные данные: список недопустимых значений bear_name
-    Шаги: 
-        послать REST Post на создание записи
-    Ожидаемый результат:
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_create_bear_names
+    Input data: list of invalid bear_name values 
+    Steps: 
+        send REST Post to create a record
+    Expected result:
+        response code not 200
+        response code 400
 
-Негавтивный тест создания записи с недопустимым bear_age
+Negative bear POST create. WRONG bear_age
     
-    Автотест: test_negative_create_bear_ages
-    Входные данные: список недопустимых значений bear_age
-    Шаги: 
-        послать REST Post на создание записи
-    Ожидаемый результат:
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_create_bear_ages
+    Input data: list of invalid bear_age values 
+    Steps: 
+        send REST Post to create a record
+    Expected result:
+        response code not 200
+        response code 400
 
-Негавтивный тест создания записи в БД с bear_id, заданным клиентом
+Negative bear POST create. Set bear_id by client
     
-    Автотест: test_negative_create_bear_user_ids
-    Входные данные: None
-    Шаги: 
-        послать REST Post на создание записи
-    Ожидаемый результат:
-        код ответа не 200
-        код ответа 400
-        запись не создана
+    Autotest name: test_negative_create_bear_user_ids
+    Input data: None
+    Steps: 
+        send REST Post to create a record
+    Expected result:
+        response code not 200
+        response code 400
+        record not created
 
-Негавтивный тест запроса указанной записи из БД
+Negative SPECIFIC bear GET read
     
-    Автотест: test_negative_get_bear
-    Входные данные: список несуществующих и недопустимых bear_id
-    Шаги: 
-        послать REST Get bear_id из списка
-    Ожидаемый результат
-        код ответа 404, если bear_id - int 
-        код ответа 400, если bear_id - не int
+    Autotest name: test_negative_get_bear
+    Input data: list of nonexistent and invalid bear_id
+    Steps: 
+        send REST Get bear_id from the list
+    Expected result
+        response code 404, если bear_id - int 
+        response code 400, если bear_id - not int
 
-Позитивный тест удаления записей из БД по одной
+Positive check Delete One bear
     
-    Автотест: test_positive_delete_one_bear
-    Входные данные: None
-    Шаги: 
-        создать запись
-        удалить запись
-        запросить удаленную запись
-    Ожидаемый результат
-        код ответа 200 на удаление записи
-        запись не существует при попытке запроса
+    Autotest name: test_positive_delete_one_bear
+    Input data: None
+    Steps: 
+        create record
+        delete record
+        query deleted record
+    Expected result
+        response code 200 to delete a record
+        record does not exist when trying to query
 
-Негавтивный тест удаления одной несуществующей записи
+Negative check Delete One non-existent bear
     
-    Автотест: test_negative_delete_one_bear
-    Входные данные: None
-    Шаги: 
-        послать REST Delete несуществующей записи
-    Ожидаемый результат
-        код ответа 404
+    Autotest name: test_negative_delete_one_bear
+    Input data: None
+    Steps: 
+        send REST Delete non-existent record
+    Expected result
+        response code 404
 
-Позитивный тест чтения всех записей БД и удаления всех записей БД
+Positive check Get All + Delete All bears
     
-    Автотест: test_positive_get_all_delete_all_bears
-    Входные данные: None
-    Шаги: 
-        создать 10 записей
-        прочитать все записи одним запросом
-        удалить все записи одним запросом
-    Ожидаемый результат
-        количество прочитанных записей == 10
+    Autotest name: test_positive_get_all_delete_all_bears
+    Input data: None
+    Steps: 
+        create 10 records
+        get whole batabase by get_all request
+        clear batabase (delete all records)
+    Expected result
+        number of records in database == 10
         база данных пуста
 
-Позитивный изменения существующих записей БД
+Positive bear Update all items
     
-    Автотест: test_positive_update_specific_bear_all
-    Входные данные: допустимые комбинации значний bear_type, bear_name и bear_age медведей
-    Шаги: 
-        создать запись
-        послать запрос на изменение записи
-    Ожидаемый результат:
-        код ответа 200
+    Autotest name: test_positive_update_specific_bear_all
+    Input data: valid combinations of bear_type, bear_name and bear_age values
+    Steps: 
+        create record
+        send a REST Update to change the record
+    Expected result:
+        response code 200
         запись изменена
 
-Негавтивный тест изменения записи с недопустимым значением bear_type
+Negative bear Update. WRONG bear_type
     
-    Автотест: test_negative_update_specific_bear_type
-    Входные данные: список недопустимых значений bear_type
-    Шаги: 
-        послать REST Update запрос на изменение записи 
-    Ожидаемый результат:
-        запись не изменена
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_update_specific_bear_type
+    Input data: list of invalid bear_type values 
+    Steps: 
+        create record
+        send a REST Update to change the record
+    Expected result:
+        record is not changed
+        response code not 200
+        response code 400
         
-Негавтивный тест изменения записи с недопустимым значением bear_name
+Negative bear Update. WRONG bear_name
     
-    Автотест: test_negative_update_specific_bear_name
-    Входные данные: список недопустимых значений bear_name
-    Шаги: 
-        послать REST Update запрос на изменение записи 
-    Ожидаемый результат:
-        запись не изменена
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_update_specific_bear_name
+    Input data: list of invalid bear_name values 
+    Steps: 
+        create record
+        send a REST Update to change the record
+    Expected result:
+        record is not changed
+        response code not 200
+        response code 400
     
     
-Негавтивный тест изменения записи с недопустимым значением bear_age
+Negative bear Update. WRONG bear_age
     
-    Автотест: test_negative_update_specific_bear_age
-    Входные данные: список недопустимых значений bear_age
-    Шаги: 
-        послать REST Update запрос на изменение записи 
-    Ожидаемый результат:
-        запись не изменена
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_update_specific_bear_age
+    Input data: list of invalid bear_age values 
+    Steps: 
+        create record
+        send a REST Update to change the record
+    Expected result:
+        record is not changed
+        response code not 200
+        response code 400
     
-Негавтивный тест изменения bear_id в записи
+Proof that there is no possibility to change bear_id by Update
     
-    Автотест: test_negative_update_specific_bear_id
-    Входые данные: None
-    Шаги: 
-        послать REST Update запрос на изменение записи 
-    Ожидаемый результат:
-        запись не изменена
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_update_specific_bear_id
+    Input data: None
+    Steps: 
+        create record
+        send a REST Update to change the record
+    Expected result:
+        record is not changed
+        response code not 200
+        response code 400
     
-Негавтивный тест создания и чтения записей в БД
+Negative http incorrect header check
     
-    Автотест: test_negative_use_incorrect_header
-    Входые данные: список недопустимых/некорректных заголовков для REST звапросов
-    Шаги: 
-        послать REST Post на создание записи
-    Ожидаемый результат:
-        запись не создана
-        код ответа не 200
-        код ответа 400
+    Autotest name: test_negative_use_incorrect_header
+    Input data: list of invalid headers for REST requests
+    Steps: 
+        send a REST Post to create the record
+    Expected result:
+        record not created
+        response code not 200
+        response code 400

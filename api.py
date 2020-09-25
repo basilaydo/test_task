@@ -9,7 +9,7 @@ from constants import DockerConstants, ApiConstants
 
 
 class ApiClient:
-    """API class"""
+    """Bears API class"""
 
     def __init__(self, base_url=DockerConstants.BASE_URL):
         """ApiClient init
