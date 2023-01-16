@@ -72,7 +72,7 @@ def create_simple_bear(api_bear) -> tuple:
     return bear_id, bear_json
 
 
-@pytest.mark.usefixtures('smoke_check', 'clear')
+@pytest.mark.usefixtures('use_docker', 'smoke_check', 'clear')
 @allure.feature('Test suit for Alaska test')
 class TestAlaska:
 

@@ -106,10 +106,9 @@ def validate_response_code(resp_obj, code, should_be_equal=True):
     :type resp_obj: requests.models.Response
     :parameter code: HTTP statuse code
     :type code: int
-    :parameter should_be_equal: True -> resp_obj == code, False -> resp_obj != code,
+    :parameter should_be_equal: True -> assert resp_obj == code, False -> assert resp_obj != code,
     :type should_be_equal: int
-    :return: validation result
-    :rtype: bool
+    :return: None
     """
     if should_be_equal:
         assert resp_obj.status_code == code, 'STATUS CODE: {0}: {1}'.format(resp_obj.status_code, resp_obj.reason)

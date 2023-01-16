@@ -10,9 +10,10 @@ import requests
 from socket import create_connection
 from constants import DockerConstants
 import pytest
+from logger import set_common_logger, create_test_logger
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture(scope='session', autouse=False)
 def use_docker(image=DockerConstants.DOCKER_IMAGE, tag=DockerConstants.DOCKER_TAG, host=DockerConstants.HOST,
                port=DockerConstants.PORT, timeout=DockerConstants.CONNECT_TIMEOUT):
     """Fixture that runs docker container on start and stops upon completion a session
@@ -56,3 +57,15 @@ def use_docker(image=DockerConstants.DOCKER_IMAGE, tag=DockerConstants.DOCKER_TA
 
     container.stop()
     container.remove()
+
+
+def pytest_configure():
+    # Set console log level for a project
+    console_log_lvl = os.getenv('CONSOLE_LOG_LEVEL', 'INFO')
+    set_common_logger(console_level=console_log_lvl)
+
+
+@pytest.fixture(autouse=True)
+def logger(request):
+    """Instance of test logger which will be created for each test"""
+    yield create_test_logger(request.node.name)
